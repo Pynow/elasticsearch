@@ -16,7 +16,7 @@ from elasticsearch import Elasticsearch, helpers
 
 class Elastic(object):
         
-    def __init__(self, elastic=None, url='http://172.16.1.25:9090'):        
+    def __init__(self, elastic=None, url='http://192.168.1.121:9200'):        
       self.elastic = elastic or Elasticsearch(url)
       
     def exists(self, index):
