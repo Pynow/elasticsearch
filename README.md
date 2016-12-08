@@ -1,4 +1,4 @@
-*elasticsearch Python脚本*
+#elasticsearch Python脚本
 
 ---
 
