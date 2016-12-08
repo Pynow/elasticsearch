@@ -1,20 +1,3 @@
-Skip to content
-This repository
-Search
-Pull requests
-Issues
-Gist
- @Amua
- Unwatch 1
-  Star 0
- Fork 0 Amua/FileDetect
- Code  Issues 0  Pull requests 0  Projects 0  Wiki  Pulse  Graphs  Settings
-Branch: master Find file Copy pathFileDetect/fdns.py
-19cf815  on 14 Oct
-@Amua Amua Create fdns.py
-1 contributor
-RawBlameHistory     
-197 lines (174 sloc)  7.55 KB
 #coding: utf-8
 
 import os
@@ -210,6 +193,3 @@ def main():
     
 if __name__ == "__main__":   
     main()
-    
-Contact GitHub API Training Shop Blog About
-© 2016 GitHub, Inc. Terms Privacy Security Status Help
