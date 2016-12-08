@@ -103,7 +103,7 @@ class ElasticExportIndex(logRecode):
     
 def usage():      
     print "Example:"
-    print "%s -e 172.16.1.25:9090 -i webinfo -f save.txt -g" %sys.argv[0]    
+    print "%s -e 192.168.1.121:9200 -i indexname -f result.json -g" %sys.argv[0]    
     sys.exit(1)
     
 def main():    
