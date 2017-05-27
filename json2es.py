@@ -8,6 +8,9 @@ import Queue
 import getopt
 from datetime import datetime
 from elasticsearch import Elasticsearch, helpers
+import sys 
+reload(sys) 
+sys.setdefaultencoding('utf8')
 
 class logRecode(object):
     def __init__(self):
