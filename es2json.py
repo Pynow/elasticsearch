@@ -20,12 +20,14 @@ class logRecode(object):
 class ElasticExportIndex(logRecode):
     
     def __init__(self, es_host, index_name, save_name,
-                  b_gzip=False, scroll_size=1000, queue_size=10000):  
-        logRecode.__init__(self)      
+                  b_gzip=False, count=False, scroll_size=1000,queue_size=10000):  
+        logRecode.__init__(self)  
         self.elastic = Elasticsearch(es_host)
         self.index_name = index_name
         self.save_name = save_name
         self.b_gzip = b_gzip
+        self.count = int(count) if count else False # select size
+        self.res_count = 0
         self.scroll_size = scroll_size                
         self.queue = Queue.Queue(queue_size)
         self.fquit = object()          
@@ -40,9 +42,11 @@ class ElasticExportIndex(logRecode):
                         size=self.scroll_size,
                         request_timeout=60)             
         scroll_size = res['hits']['total']              
-        self.total = scroll_size 
+        self.total = scroll_size
+        # print self.total
         
         while (scroll_size > 0):
+            
             try:                   
                 scroll_id = res['_scroll_id']
                 res = self.elastic.scroll(scroll_id=scroll_id, scroll='3m')                  
@@ -51,7 +55,11 @@ class ElasticExportIndex(logRecode):
                         self.queue.put(record['_source'])
                     except Exception as e:                  
                         print e                                                                            
-                scroll_size = len(res['hits']['hits'])                                   
+                scroll_size = len(res['hits']['hits'])
+                self.res_count += scroll_size # count check
+                if self.count and (self.count <= self.res_count): break
+                # print self.res_count,self.count
+                print('[+] fetch {}...'.format(self.res_count))
             except Exception as e:                              
                 pass                              
     
@@ -103,14 +111,14 @@ class ElasticExportIndex(logRecode):
     
 def usage():      
     print "Example:"
-    print "%s -e 192.168.1.121:9200 -i indexname -f result.json -g" %sys.argv[0]    
+    print "%s -e 192.168.1.121:9200 -i indexname -f result.json -c 10000 -g " %sys.argv[0]    
     sys.exit(1)
     
 def main():    
     if len(sys.argv[1:]) < 1:
         usage()
     try: 
-        opts, args = getopt.getopt(sys.argv[1:], 'hge:i:f:', ["help", "gzip", "elastic", "index", "file"])        
+        opts, args = getopt.getopt(sys.argv[1:], 'hge:i:f:c:', ["help", "gzip", "elastic", "index", "file","count"])        
     except getopt.GetoptError, e:
         print str(e)
         usage()        
@@ -118,7 +126,8 @@ def main():
     b_gzip = False
     es_host = '' 
     es_index = ''
-    save_file = ''  
+    save_file = ''
+    count = False
     encoding = sys.getfilesystemencoding()     
     
     for o, a in opts:
@@ -133,12 +142,14 @@ def main():
             es_index = a
         elif o in ("-f", "--file"):
             save_file = a
+        elif o in ("-c", "--count"):
+            count = a
         else:
             assert False, "Unhandled Option" 
             
     if not (es_host and es_index and save_file):
         usage()           
-    sample = ElasticExportIndex(es_host, es_index, save_file, b_gzip)
+    sample = ElasticExportIndex(es_host, es_index, save_file, b_gzip, count)
     print sample
     
 if __name__ == "__main__":
